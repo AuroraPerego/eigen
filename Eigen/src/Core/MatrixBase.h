@@ -320,6 +320,8 @@ template<typename Derived> class MatrixBase
 /////////// LU module ///////////
 
     inline const FullPivLU<PlainObject> fullPivLu() const;
+
+    EIGEN_DEVICE_FUNC
     inline const PartialPivLU<PlainObject> partialPivLu() const;
 
     inline const PartialPivLU<PlainObject> lu() const;
