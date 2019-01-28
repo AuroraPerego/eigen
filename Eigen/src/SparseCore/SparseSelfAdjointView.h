@@ -35,9 +35,11 @@ struct traits<SparseSelfAdjointView<MatrixType,Mode> > : traits<MatrixType> {
 };
 
 template<int SrcMode,int DstMode,typename MatrixType,int DestOrder>
+EIGEN_DEVICE_FUNC
 void permute_symm_to_symm(const MatrixType& mat, SparseMatrix<typename MatrixType::Scalar,DestOrder,typename MatrixType::StorageIndex>& _dest, const typename MatrixType::StorageIndex* perm = 0);
 
 template<int Mode,typename MatrixType,int DestOrder>
+EIGEN_DEVICE_FUNC
 void permute_symm_to_fullsymm(const MatrixType& mat, SparseMatrix<typename MatrixType::Scalar,DestOrder,typename MatrixType::StorageIndex>& _dest, const typename MatrixType::StorageIndex* perm = 0);
 
 }
@@ -61,16 +63,21 @@ template<typename MatrixType, unsigned int Mode_> class SparseSelfAdjointView
     typedef typename internal::ref_selector<MatrixType>::non_const_type MatrixTypeNested;
     typedef internal::remove_all_t<MatrixTypeNested> MatrixTypeNested_;
     
+    EIGEN_DEVICE_FUNC
     explicit inline SparseSelfAdjointView(MatrixType& matrix) : m_matrix(matrix)
     {
       eigen_assert(rows()==cols() && "SelfAdjointView is only for squared matrices");
     }
 
+    EIGEN_DEVICE_FUNC
     inline Index rows() const { return m_matrix.rows(); }
+    EIGEN_DEVICE_FUNC
     inline Index cols() const { return m_matrix.cols(); }
 
     /** \internal \returns a reference to the nested matrix */
+    EIGEN_DEVICE_FUNC
     const MatrixTypeNested_& matrix() const { return m_matrix; }
+    EIGEN_DEVICE_FUNC
     std::remove_reference_t<MatrixTypeNested>& matrix() { return m_matrix; }
 
     /** \returns an expression of the matrix product between a sparse self-adjoint matrix \c *this and a sparse matrix \a rhs.
@@ -79,6 +86,7 @@ template<typename MatrixType, unsigned int Mode_> class SparseSelfAdjointView
       * Indeed, the SparseSelfadjointView operand is first copied into a temporary SparseMatrix before computing the product.
       */
     template<typename OtherDerived>
+    EIGEN_DEVICE_FUNC
     Product<SparseSelfAdjointView, OtherDerived>
     operator*(const SparseMatrixBase<OtherDerived>& rhs) const
     {
@@ -91,6 +99,7 @@ template<typename MatrixType, unsigned int Mode_> class SparseSelfAdjointView
       * Indeed, the SparseSelfadjointView operand is first copied into a temporary SparseMatrix before computing the product.
       */
     template<typename OtherDerived> friend
+    EIGEN_DEVICE_FUNC
     Product<OtherDerived, SparseSelfAdjointView>
     operator*(const SparseMatrixBase<OtherDerived>& lhs, const SparseSelfAdjointView& rhs)
     {
@@ -99,6 +108,7 @@ template<typename MatrixType, unsigned int Mode_> class SparseSelfAdjointView
     
     /** Efficient sparse self-adjoint matrix times dense vector/matrix product */
     template<typename OtherDerived>
+    EIGEN_DEVICE_FUNC
     Product<SparseSelfAdjointView,OtherDerived>
     operator*(const MatrixBase<OtherDerived>& rhs) const
     {
@@ -107,6 +117,7 @@ template<typename MatrixType, unsigned int Mode_> class SparseSelfAdjointView
 
     /** Efficient dense vector/matrix times sparse self-adjoint matrix product */
     template<typename OtherDerived> friend
+    EIGEN_DEVICE_FUNC
     Product<OtherDerived,SparseSelfAdjointView>
     operator*(const MatrixBase<OtherDerived>& lhs, const SparseSelfAdjointView& rhs)
     {
@@ -122,22 +133,26 @@ template<typename MatrixType, unsigned int Mode_> class SparseSelfAdjointView
       * call this function with u.adjoint().
       */
     template<typename DerivedU>
+    EIGEN_DEVICE_FUNC
     SparseSelfAdjointView& rankUpdate(const SparseMatrixBase<DerivedU>& u, const Scalar& alpha = Scalar(1));
     
     /** \returns an expression of P H P^-1 */
     // TODO implement twists in a more evaluator friendly fashion
+    EIGEN_DEVICE_FUNC
     SparseSymmetricPermutationProduct<MatrixTypeNested_,Mode> twistedBy(const PermutationMatrix<Dynamic,Dynamic,StorageIndex>& perm) const
     {
       return SparseSymmetricPermutationProduct<MatrixTypeNested_,Mode>(m_matrix, perm);
     }
 
     template<typename SrcMatrixType,int SrcMode>
+    EIGEN_DEVICE_FUNC
     SparseSelfAdjointView& operator=(const SparseSymmetricPermutationProduct<SrcMatrixType,SrcMode>& permutedMatrix)
     {
       internal::call_assignment_no_alias_no_transpose(*this, permutedMatrix);
       return *this;
     }
 
+    EIGEN_DEVICE_FUNC
     SparseSelfAdjointView& operator=(const SparseSelfAdjointView& src)
     {
       PermutationMatrix<Dynamic,Dynamic,StorageIndex> pnull;
@@ -148,12 +163,14 @@ template<typename MatrixType, unsigned int Mode_> class SparseSelfAdjointView
     EIGEN_DEFAULT_COPY_CONSTRUCTOR(SparseSelfAdjointView)
 
     template<typename SrcMatrixType,unsigned int SrcMode>
+    EIGEN_DEVICE_FUNC
     SparseSelfAdjointView& operator=(const SparseSelfAdjointView<SrcMatrixType,SrcMode>& src)
     {
       PermutationMatrix<Dynamic,Dynamic,StorageIndex> pnull;
       return *this = src.twistedBy(pnull);
     }
     
+    EIGEN_DEVICE_FUNC
     void resize(Index rows, Index cols)
     {
       EIGEN_ONLY_USED_FOR_DEBUG(rows);
@@ -177,6 +194,7 @@ template<typename MatrixType, unsigned int Mode_> class SparseSelfAdjointView
 
 template<typename Derived>
 template<unsigned int UpLo>
+EIGEN_DEVICE_FUNC
 typename SparseMatrixBase<Derived>::template ConstSelfAdjointViewReturnType<UpLo>::Type SparseMatrixBase<Derived>::selfadjointView() const
 {
   return SparseSelfAdjointView<const Derived, UpLo>(derived());
@@ -184,6 +202,7 @@ typename SparseMatrixBase<Derived>::template ConstSelfAdjointViewReturnType<UpLo
 
 template<typename Derived>
 template<unsigned int UpLo>
+EIGEN_DEVICE_FUNC
 typename SparseMatrixBase<Derived>::template SelfAdjointViewReturnType<UpLo>::Type SparseMatrixBase<Derived>::selfadjointView()
 {
   return SparseSelfAdjointView<Derived, UpLo>(derived());
@@ -195,6 +214,7 @@ typename SparseMatrixBase<Derived>::template SelfAdjointViewReturnType<UpLo>::Ty
 
 template<typename MatrixType, unsigned int Mode>
 template<typename DerivedU>
+EIGEN_DEVICE_FUNC
 SparseSelfAdjointView<MatrixType,Mode>&
 SparseSelfAdjointView<MatrixType,Mode>::rankUpdate(const SparseMatrixBase<DerivedU>& u, const Scalar& alpha)
 {
@@ -231,6 +251,7 @@ struct Assignment<DstXprType, SrcXprType, Functor, SparseSelfAdjoint2Sparse>
   typedef internal::assign_op<typename DstXprType::Scalar,typename SrcXprType::Scalar> AssignOpType;
 
   template<typename DestScalar,int StorageOrder>
+  EIGEN_DEVICE_FUNC
   static void run(SparseMatrix<DestScalar,StorageOrder,StorageIndex> &dst, const SrcXprType &src, const AssignOpType&/*func*/)
   {
     internal::permute_symm_to_fullsymm<SrcXprType::Mode>(src.matrix(), dst);
@@ -238,6 +259,7 @@ struct Assignment<DstXprType, SrcXprType, Functor, SparseSelfAdjoint2Sparse>
 
   // FIXME: the handling of += and -= in sparse matrices should be cleanup so that next two overloads could be reduced to:
   template<typename DestScalar,int StorageOrder,typename AssignFunc>
+  EIGEN_DEVICE_FUNC
   static void run(SparseMatrix<DestScalar,StorageOrder,StorageIndex> &dst, const SrcXprType &src, const AssignFunc& func)
   {
     SparseMatrix<DestScalar,StorageOrder,StorageIndex> tmp(src.rows(),src.cols());
@@ -246,6 +268,7 @@ struct Assignment<DstXprType, SrcXprType, Functor, SparseSelfAdjoint2Sparse>
   }
 
   template<typename DestScalar,int StorageOrder>
+  EIGEN_DEVICE_FUNC
   static void run(SparseMatrix<DestScalar,StorageOrder,StorageIndex> &dst, const SrcXprType &src,
                   const internal::add_assign_op<typename DstXprType::Scalar,typename SrcXprType::Scalar>& /* func */)
   {
@@ -255,6 +278,7 @@ struct Assignment<DstXprType, SrcXprType, Functor, SparseSelfAdjoint2Sparse>
   }
 
   template<typename DestScalar,int StorageOrder>
+  EIGEN_DEVICE_FUNC
   static void run(SparseMatrix<DestScalar,StorageOrder,StorageIndex> &dst, const SrcXprType &src,
                   const internal::sub_assign_op<typename DstXprType::Scalar,typename SrcXprType::Scalar>& /* func */)
   {
@@ -262,6 +286,7 @@ struct Assignment<DstXprType, SrcXprType, Functor, SparseSelfAdjoint2Sparse>
     run(tmp, src, AssignOpType());
     dst -= tmp;
   }
+  EIGEN_DEVICE_FUNC
 };
 
 } // end namespace internal
@@ -273,6 +298,7 @@ struct Assignment<DstXprType, SrcXprType, Functor, SparseSelfAdjoint2Sparse>
 namespace internal {
 
 template<int Mode, typename SparseLhsType, typename DenseRhsType, typename DenseResType, typename AlphaType>
+EIGEN_DEVICE_FUNC
 inline void sparse_selfadjoint_time_dense_product(const SparseLhsType& lhs, const DenseRhsType& rhs, DenseResType& res, const AlphaType& alpha)
 {
   EIGEN_ONLY_USED_FOR_DEBUG(alpha);
@@ -338,6 +364,7 @@ struct generic_product_impl<LhsView, Rhs, SparseSelfAdjointShape, DenseShape, Pr
 : generic_product_impl_base<LhsView, Rhs, generic_product_impl<LhsView, Rhs, SparseSelfAdjointShape, DenseShape, ProductType> >
 {
   template<typename Dest>
+  EIGEN_DEVICE_FUNC
   static void scaleAndAddTo(Dest& dst, const LhsView& lhsView, const Rhs& rhs, const typename Dest::Scalar& alpha)
   {
     typedef typename LhsView::MatrixTypeNested_ Lhs;
@@ -355,6 +382,7 @@ struct generic_product_impl<Lhs, RhsView, DenseShape, SparseSelfAdjointShape, Pr
 : generic_product_impl_base<Lhs, RhsView, generic_product_impl<Lhs, RhsView, DenseShape, SparseSelfAdjointShape, ProductType> >
 {
   template<typename Dest>
+  EIGEN_DEVICE_FUNC
   static void scaleAndAddTo(Dest& dst, const Lhs& lhs, const RhsView& rhsView, const typename Dest::Scalar& alpha)
   {
     typedef typename RhsView::MatrixTypeNested_ Rhs;
@@ -380,6 +408,7 @@ struct product_evaluator<Product<LhsView, Rhs, DefaultProduct>, ProductTag, Spar
   typedef typename XprType::PlainObject PlainObject;
   typedef evaluator<PlainObject> Base;
 
+  EIGEN_DEVICE_FUNC
   product_evaluator(const XprType& xpr)
     : m_lhs(xpr.lhs()), m_result(xpr.rows(), xpr.cols())
   {
@@ -400,6 +429,7 @@ struct product_evaluator<Product<Lhs, RhsView, DefaultProduct>, ProductTag, Spar
   typedef typename XprType::PlainObject PlainObject;
   typedef evaluator<PlainObject> Base;
 
+  EIGEN_DEVICE_FUNC
   product_evaluator(const XprType& xpr)
     : m_rhs(xpr.rhs()), m_result(xpr.rows(), xpr.cols())
   {
@@ -420,6 +450,7 @@ protected:
 namespace internal {
 
 template<int Mode,typename MatrixType,int DestOrder>
+EIGEN_DEVICE_FUNC
 void permute_symm_to_fullsymm(const MatrixType& mat, SparseMatrix<typename MatrixType::Scalar,DestOrder,typename MatrixType::StorageIndex>& _dest, const typename MatrixType::StorageIndex* perm)
 {
   typedef typename MatrixType::StorageIndex StorageIndex;
@@ -497,7 +528,7 @@ void permute_symm_to_fullsymm(const MatrixType& mat, SparseMatrix<typename Matri
       else if(( (Mode&Lower)==Lower && r>c) || ( (Mode&Upper)==Upper && r<c))
       {
         if(!StorageOrderMatch)
-          std::swap(ip,jp);
+          numext::swap(ip,jp);
         Index k = count[jp]++;
         dest.innerIndexPtr()[k] = ip;
         dest.valuePtr()[k] = it.value();
@@ -510,6 +541,7 @@ void permute_symm_to_fullsymm(const MatrixType& mat, SparseMatrix<typename Matri
 }
 
 template<int SrcMode_,int DstMode_,typename MatrixType,int DstOrder>
+EIGEN_DEVICE_FUNC
 void permute_symm_to_symm(const MatrixType& mat, SparseMatrix<typename MatrixType::Scalar,DstOrder,typename MatrixType::StorageIndex>& _dest, const typename MatrixType::StorageIndex* perm)
 {
   typedef typename MatrixType::StorageIndex StorageIndex;
@@ -567,7 +599,7 @@ void permute_symm_to_symm(const MatrixType& mat, SparseMatrix<typename MatrixTyp
       Index k = count[int(DstMode)==int(Lower) ? (std::min)(ip,jp) : (std::max)(ip,jp)]++;
       dest.innerIndexPtr()[k] = int(DstMode)==int(Lower) ? (std::max)(ip,jp) : (std::min)(ip,jp);
       
-      if(!StorageOrderMatch) std::swap(ip,jp);
+      if(!StorageOrderMatch) numext::swap(ip,jp);
       if( ((int(DstMode)==int(Lower) && ip<jp) || (int(DstMode)==int(Upper) && ip>jp)))
         dest.valuePtr()[k] = numext::conj(it.value());
       else
@@ -606,14 +638,19 @@ class SparseSymmetricPermutationProduct
     typedef typename MatrixType::Nested MatrixTypeNested;
     typedef internal::remove_all_t<MatrixTypeNested> NestedExpression;
     
+    EIGEN_DEVICE_FUNC
     SparseSymmetricPermutationProduct(const MatrixType& mat, const Perm& perm)
       : m_matrix(mat), m_perm(perm)
     {}
     
+    EIGEN_DEVICE_FUNC
     inline Index rows() const { return m_matrix.rows(); }
+    EIGEN_DEVICE_FUNC
     inline Index cols() const { return m_matrix.cols(); }
         
+    EIGEN_DEVICE_FUNC
     const NestedExpression& matrix() const { return m_matrix; }
+    EIGEN_DEVICE_FUNC
     const Perm& perm() const { return m_perm; }
     
   protected:
@@ -630,6 +667,7 @@ struct Assignment<DstXprType, SparseSymmetricPermutationProduct<MatrixType,Mode>
   typedef SparseSymmetricPermutationProduct<MatrixType,Mode> SrcXprType;
   typedef typename DstXprType::StorageIndex DstIndex;
   template<int Options>
+  EIGEN_DEVICE_FUNC
   static void run(SparseMatrix<Scalar,Options,DstIndex> &dst, const SrcXprType &src, const internal::assign_op<Scalar,typename MatrixType::Scalar> &)
   {
     // internal::permute_symm_to_fullsymm<Mode>(m_matrix,_dest,m_perm.indices().data());
@@ -639,6 +677,7 @@ struct Assignment<DstXprType, SparseSymmetricPermutationProduct<MatrixType,Mode>
   }
   
   template<typename DestType,unsigned int DestMode>
+  EIGEN_DEVICE_FUNC
   static void run(SparseSelfAdjointView<DestType,DestMode>& dst, const SrcXprType &src, const internal::assign_op<Scalar,typename MatrixType::Scalar> &)
   {
     internal::permute_symm_to_symm<Mode,DestMode>(src.matrix(),dst.matrix(),src.perm().indices().data());

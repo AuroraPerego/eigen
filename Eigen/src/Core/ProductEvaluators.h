@@ -766,6 +766,7 @@ struct generic_product_impl<Lhs,Rhs,TriangularShape,DenseShape,ProductTag>
   typedef typename Product<Lhs,Rhs>::Scalar Scalar;
 
   template<typename Dest>
+  EIGEN_DEVICE_FUNC
   static void scaleAndAddTo(Dest& dst, const Lhs& lhs, const Rhs& rhs, const Scalar& alpha)
   {
     triangular_product_impl<Lhs::Mode,true,typename Lhs::MatrixType,false,Rhs, Rhs::ColsAtCompileTime==1>
@@ -780,6 +781,7 @@ struct generic_product_impl<Lhs,Rhs,DenseShape,TriangularShape,ProductTag>
   typedef typename Product<Lhs,Rhs>::Scalar Scalar;
 
   template<typename Dest>
+  EIGEN_DEVICE_FUNC
   static void scaleAndAddTo(Dest& dst, const Lhs& lhs, const Rhs& rhs, const Scalar& alpha)
   {
     triangular_product_impl<Rhs::Mode,false,Lhs,Lhs::RowsAtCompileTime==1, typename Rhs::MatrixType, false>::run(dst, lhs, rhs.nestedExpression(), alpha);
@@ -879,6 +881,7 @@ public:
 
 protected:
   template<int LoadMode,typename PacketType>
+  EIGEN_DEVICE_FUNC
   EIGEN_STRONG_INLINE PacketType packet_impl(Index row, Index col, Index id, internal::true_type) const
   {
     return internal::pmul(m_matImpl.template packet<LoadMode,PacketType>(row, col),
@@ -886,6 +889,7 @@ protected:
   }
 
   template<int LoadMode,typename PacketType>
+  EIGEN_DEVICE_FUNC
   EIGEN_STRONG_INLINE PacketType packet_impl(Index row, Index col, Index id, internal::false_type) const
   {
     enum {
@@ -930,6 +934,7 @@ struct product_evaluator<Product<Lhs, Rhs, ProductKind>, ProductTag, DiagonalSha
 
 #ifndef EIGEN_GPUCC
   template<int LoadMode,typename PacketType>
+  EIGEN_DEVICE_FUNC
   EIGEN_STRONG_INLINE PacketType packet(Index row, Index col) const
   {
     // FIXME: NVCC used to complain about the template keyword, but we have to check whether this is still the case.
@@ -939,6 +944,7 @@ struct product_evaluator<Product<Lhs, Rhs, ProductKind>, ProductTag, DiagonalSha
   }
 
   template<int LoadMode,typename PacketType>
+  EIGEN_DEVICE_FUNC
   EIGEN_STRONG_INLINE PacketType packet(Index idx) const
   {
     return packet<LoadMode,PacketType>(int(StorageOrder)==ColMajor?idx:0,int(StorageOrder)==ColMajor?0:idx);
@@ -974,6 +980,7 @@ struct product_evaluator<Product<Lhs, Rhs, ProductKind>, ProductTag, DenseShape,
 
 #ifndef EIGEN_GPUCC
   template<int LoadMode,typename PacketType>
+  EIGEN_DEVICE_FUNC
   EIGEN_STRONG_INLINE PacketType packet(Index row, Index col) const
   {
     return this->template packet_impl<LoadMode,PacketType>(row,col, col,
@@ -981,6 +988,7 @@ struct product_evaluator<Product<Lhs, Rhs, ProductKind>, ProductTag, DenseShape,
   }
 
   template<int LoadMode,typename PacketType>
+  EIGEN_DEVICE_FUNC
   EIGEN_STRONG_INLINE PacketType packet(Index idx) const
   {
     return packet<LoadMode,PacketType>(int(StorageOrder)==ColMajor?idx:0,int(StorageOrder)==ColMajor?0:idx);

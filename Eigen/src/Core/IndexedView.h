@@ -119,28 +119,35 @@ public:
   typedef internal::remove_all_t<XprType> NestedExpression;
 
   template<typename T0, typename T1>
+  EIGEN_DEVICE_FUNC
   IndexedView(XprType& xpr, const T0& rowIndices, const T1& colIndices)
     : m_xpr(xpr), m_rowIndices(rowIndices), m_colIndices(colIndices)
   {}
 
   /** \returns number of rows */
+  EIGEN_DEVICE_FUNC
   Index rows() const { return internal::index_list_size(m_rowIndices); }
 
   /** \returns number of columns */
+  EIGEN_DEVICE_FUNC
   Index cols() const { return internal::index_list_size(m_colIndices); }
 
   /** \returns the nested expression */
+  EIGEN_DEVICE_FUNC
   const internal::remove_all_t<XprType>&
   nestedExpression() const { return m_xpr; }
 
   /** \returns the nested expression */
+  EIGEN_DEVICE_FUNC
   std::remove_reference_t<XprType>&
   nestedExpression() { return m_xpr; }
 
   /** \returns a const reference to the object storing/generating the row indices */
+  EIGEN_DEVICE_FUNC
   const RowIndices& rowIndices() const { return m_rowIndices; }
 
   /** \returns a const reference to the object storing/generating the column indices */
+  EIGEN_DEVICE_FUNC
   const ColIndices& colIndices() const { return m_colIndices; }
 
 protected:

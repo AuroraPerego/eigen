@@ -114,6 +114,7 @@ class PermutationBase : public EigenBase<Derived>
 
     #ifndef EIGEN_PARSED_BY_DOXYGEN
     template<typename DenseDerived>
+    EIGEN_DEVICE_FUNC
     void evalTo(MatrixBase<DenseDerived>& other) const
     {
       other.setZero();
@@ -126,6 +127,7 @@ class PermutationBase : public EigenBase<Derived>
       * is inefficient to return this Matrix object by value. For efficiency, favor using
       * the Matrix constructor taking EigenBase objects.
       */
+    EIGEN_DEVICE_FUNC
     DenseMatrixType toDenseMatrix() const
     {
       return derived();
@@ -173,6 +175,7 @@ class PermutationBase : public EigenBase<Derived>
       *
       * \sa applyTranspositionOnTheRight(Index,Index)
       */
+    EIGEN_DEVICE_FUNC
     Derived& applyTranspositionOnTheLeft(Index i, Index j)
     {
       eigen_assert(i>=0 && j>=0 && i<size() && j<size());
@@ -204,12 +207,14 @@ class PermutationBase : public EigenBase<Derived>
       *
       * \note \blank \note_try_to_help_rvo
       */
+    EIGEN_DEVICE_FUNC
     inline InverseReturnType inverse() const
     { return InverseReturnType(derived()); }
     /** \returns the tranpose permutation matrix.
       *
       * \note \blank \note_try_to_help_rvo
       */
+    EIGEN_DEVICE_FUNC
     inline InverseReturnType transpose() const
     { return InverseReturnType(derived()); }
 
@@ -219,11 +224,13 @@ class PermutationBase : public EigenBase<Derived>
 #ifndef EIGEN_PARSED_BY_DOXYGEN
   protected:
     template<typename OtherDerived>
+    EIGEN_DEVICE_FUNC
     void assignTranspose(const PermutationBase<OtherDerived>& other)
     {
       for (Index i=0; i<rows();++i) indices().coeffRef(other.indices().coeff(i)) = i;
     }
     template<typename Lhs,typename Rhs>
+    EIGEN_DEVICE_FUNC
     void assignProduct(const Lhs& lhs, const Rhs& rhs)
     {
       eigen_assert(lhs.cols() == rhs.rows());
@@ -238,6 +245,7 @@ class PermutationBase : public EigenBase<Derived>
       * \note \blank \note_try_to_help_rvo
       */
     template<typename Other>
+    EIGEN_DEVICE_FUNC
     inline PlainPermutationType operator*(const PermutationBase<Other>& other) const
     { return PlainPermutationType(internal::PermPermProduct, derived(), other.derived()); }
 
@@ -246,6 +254,7 @@ class PermutationBase : public EigenBase<Derived>
       * \note \blank \note_try_to_help_rvo
       */
     template<typename Other>
+    EIGEN_DEVICE_FUNC
     inline PlainPermutationType operator*(const InverseImpl<Other,PermutationStorage>& other) const
     { return PlainPermutationType(internal::PermPermProduct, *this, other.eval()); }
 
@@ -254,6 +263,7 @@ class PermutationBase : public EigenBase<Derived>
       * \note \blank \note_try_to_help_rvo
       */
     template<typename Other> friend
+    EIGEN_DEVICE_FUNC
     inline PlainPermutationType operator*(const InverseImpl<Other, PermutationStorage>& other, const PermutationBase& perm)
     { return PlainPermutationType(internal::PermPermProduct, other.eval(), perm); }
     
@@ -261,6 +271,7 @@ class PermutationBase : public EigenBase<Derived>
       *
       * This function is O(\c n) procedure allocating a buffer of \c n booleans.
       */
+    EIGEN_DEVICE_FUNC
     Index determinant() const
     {
       Index res = 1;
@@ -416,6 +427,7 @@ class PermutationMatrix : public PermutationBase<PermutationMatrix<SizeAtCompile
 
 #ifndef EIGEN_PARSED_BY_DOXYGEN
     template<typename Other>
+    EIGEN_DEVICE_FUNC
     PermutationMatrix(const InverseImpl<Other,PermutationStorage>& other)
       : m_indices(other.derived().nestedExpression().size())
     {
@@ -465,21 +477,25 @@ class Map<PermutationMatrix<SizeAtCompileTime, MaxSizeAtCompileTime, StorageInde
     typedef typename IndicesType::Scalar StorageIndex;
     #endif
 
+    EIGEN_DEVICE_FUNC
     inline Map(const StorageIndex* indicesPtr)
       : m_indices(indicesPtr)
     {}
 
+    EIGEN_DEVICE_FUNC
     inline Map(const StorageIndex* indicesPtr, Index size)
       : m_indices(indicesPtr,size)
     {}
 
     /** Copies the other permutation into *this */
     template<typename Other>
+    EIGEN_DEVICE_FUNC
     Map& operator=(const PermutationBase<Other>& other)
     { return Base::operator=(other.derived()); }
 
     /** Assignment from the Transpositions \a tr */
     template<typename Other>
+    EIGEN_DEVICE_FUNC
     Map& operator=(const TranspositionsBase<Other>& tr)
     { return Base::operator=(tr.derived()); }
 
@@ -487,6 +503,7 @@ class Map<PermutationMatrix<SizeAtCompileTime, MaxSizeAtCompileTime, StorageInde
     /** This is a special case of the templated operator=. Its purpose is to
       * prevent a default operator= from hiding the templated operator=.
       */
+    EIGEN_DEVICE_FUNC
     Map& operator=(const Map& other)
     {
       m_indices = other.m_indices;
@@ -495,8 +512,10 @@ class Map<PermutationMatrix<SizeAtCompileTime, MaxSizeAtCompileTime, StorageInde
     #endif
 
     /** const version of indices(). */
+    EIGEN_DEVICE_FUNC
     const IndicesType& indices() const { return m_indices; }
     /** \returns a reference to the stored array representing the permutation. */
+    EIGEN_DEVICE_FUNC
     IndicesType& indices() { return m_indices; }
 
   protected:
@@ -545,12 +564,15 @@ class PermutationWrapper : public PermutationBase<PermutationWrapper<IndicesType
     typedef typename Traits::IndicesType IndicesType;
     #endif
 
+    EIGEN_DEVICE_FUNC
     inline PermutationWrapper(const IndicesType& indices)
       : m_indices(indices)
     {}
 
     /** const version of indices(). */
+    EIGEN_DEVICE_FUNC
     const internal::remove_all_t<typename IndicesType::Nested>&
+    EIGEN_DEVICE_FUNC
     indices() const { return m_indices; }
 
   protected:
@@ -591,6 +613,7 @@ class InverseImpl<PermutationType, PermutationStorage>
     typedef typename PermutationType::PlainPermutationType PlainPermutationType;
     typedef internal::traits<PermutationType> PermTraits;
   protected:
+    EIGEN_DEVICE_FUNC
     InverseImpl() {}
   public:
     typedef Inverse<PermutationType> InverseType;
@@ -608,6 +631,7 @@ class InverseImpl<PermutationType, PermutationStorage>
 
     #ifndef EIGEN_PARSED_BY_DOXYGEN
     template<typename DenseDerived>
+    EIGEN_DEVICE_FUNC
     void evalTo(MatrixBase<DenseDerived>& other) const
     {
       other.setZero();
@@ -617,13 +641,16 @@ class InverseImpl<PermutationType, PermutationStorage>
     #endif
 
     /** \return the equivalent permutation matrix */
+    EIGEN_DEVICE_FUNC
     PlainPermutationType eval() const { return derived(); }
 
+    EIGEN_DEVICE_FUNC
     DenseMatrixType toDenseMatrix() const { return derived(); }
 
     /** \returns the matrix with the inverse permutation applied to the columns.
       */
     template<typename OtherDerived> friend
+    EIGEN_DEVICE_FUNC
     const Product<OtherDerived, InverseType, AliasFreeProduct>
     operator*(const MatrixBase<OtherDerived>& matrix, const InverseType& trPerm)
     {
@@ -633,6 +660,7 @@ class InverseImpl<PermutationType, PermutationStorage>
     /** \returns the matrix with the inverse permutation applied to the rows.
       */
     template<typename OtherDerived>
+    EIGEN_DEVICE_FUNC
     const Product<InverseType, OtherDerived, AliasFreeProduct>
     operator*(const MatrixBase<OtherDerived>& matrix) const
     {
@@ -641,6 +669,7 @@ class InverseImpl<PermutationType, PermutationStorage>
 };
 
 template<typename Derived>
+EIGEN_DEVICE_FUNC
 const PermutationWrapper<const Derived> MatrixBase<Derived>::asPermutation() const
 {
   return derived();

@@ -15,6 +15,7 @@
 namespace Eigen { 
 
 template<typename Derived>
+EIGEN_DEVICE_FUNC
 typename internal::traits<Derived>::Scalar
 SparseMatrixBase<Derived>::sum() const
 {
@@ -28,6 +29,7 @@ SparseMatrixBase<Derived>::sum() const
 }
 
 template<typename Scalar_, int Options_, typename Index_>
+EIGEN_DEVICE_FUNC
 typename internal::traits<SparseMatrix<Scalar_,Options_,Index_> >::Scalar
 SparseMatrix<Scalar_,Options_,Index_>::sum() const
 {
@@ -39,6 +41,7 @@ SparseMatrix<Scalar_,Options_,Index_>::sum() const
 }
 
 template<typename Scalar_, int Options_, typename Index_>
+EIGEN_DEVICE_FUNC
 typename internal::traits<SparseVector<Scalar_,Options_, Index_> >::Scalar
 SparseVector<Scalar_,Options_,Index_>::sum() const
 {

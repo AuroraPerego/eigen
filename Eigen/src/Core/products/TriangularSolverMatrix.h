@@ -21,6 +21,7 @@ template <typename Scalar, typename Index, int Mode, bool Conjugate, int TriStor
 struct trsmKernelL {
   // Generic Implementation of triangular solve for triangular matrix on left and multiple rhs.
   // Handles non-packed matrices.
+  EIGEN_DEVICE_FUNC
   static void kernel(
     Index size, Index otherSize,
     const Scalar* _tri, Index triStride,
@@ -31,6 +32,7 @@ template <typename Scalar, typename Index, int Mode, bool Conjugate, int TriStor
 struct trsmKernelR {
   // Generic Implementation of triangular solve for triangular matrix on right and multiple lhs.
   // Handles non-packed matrices.
+  EIGEN_DEVICE_FUNC
   static void kernel(
     Index size, Index otherSize,
     const Scalar* _tri, Index triStride,
@@ -38,6 +40,7 @@ struct trsmKernelR {
 };
 
 template <typename Scalar, typename Index, int Mode, bool Conjugate, int TriStorageOrder,int OtherInnerStride>
+EIGEN_DEVICE_FUNC
 EIGEN_STRONG_INLINE void trsmKernelL<Scalar, Index, Mode, Conjugate, TriStorageOrder, OtherInnerStride>::kernel(
     Index size, Index otherSize,
     const Scalar* _tri, Index triStride,
@@ -89,6 +92,7 @@ EIGEN_STRONG_INLINE void trsmKernelL<Scalar, Index, Mode, Conjugate, TriStorageO
 
 
 template <typename Scalar, typename Index, int Mode, bool Conjugate, int TriStorageOrder, int OtherInnerStride>
+EIGEN_DEVICE_FUNC
 EIGEN_STRONG_INLINE void trsmKernelR<Scalar, Index, Mode, Conjugate, TriStorageOrder, OtherInnerStride>::kernel(
     Index size, Index otherSize,
     const Scalar* _tri, Index triStride,
@@ -132,6 +136,7 @@ EIGEN_STRONG_INLINE void trsmKernelR<Scalar, Index, Mode, Conjugate, TriStorageO
 template <typename Scalar, typename Index, int Side, int Mode, bool Conjugate, int TriStorageOrder, int OtherInnerStride>
 struct triangular_solve_matrix<Scalar,Index,Side,Mode,Conjugate,TriStorageOrder,RowMajor,OtherInnerStride>
 {
+  EIGEN_DEVICE_FUNC
   static void run(
     Index size, Index cols,
     const Scalar*  tri, Index triStride,
@@ -302,6 +307,7 @@ EIGEN_DEVICE_FUNC EIGEN_DONT_INLINE void triangular_solve_matrix<Scalar,Index,On
 template <typename Scalar, typename Index, int Mode, bool Conjugate, int TriStorageOrder, int OtherInnerStride>
 struct triangular_solve_matrix<Scalar,Index,OnTheRight,Mode,Conjugate,TriStorageOrder,ColMajor,OtherInnerStride>
 {
+  EIGEN_DEVICE_FUNC
   static EIGEN_DONT_INLINE void run(
     Index size, Index otherSize,
     const Scalar* _tri, Index triStride,
@@ -310,6 +316,7 @@ struct triangular_solve_matrix<Scalar,Index,OnTheRight,Mode,Conjugate,TriStorage
 };
 
 template <typename Scalar, typename Index, int Mode, bool Conjugate, int TriStorageOrder, int OtherInnerStride>
+EIGEN_DEVICE_FUNC
 EIGEN_DONT_INLINE void triangular_solve_matrix<Scalar,Index,OnTheRight,Mode,Conjugate,TriStorageOrder,ColMajor,OtherInnerStride>::run(
     Index size, Index otherSize,
     const Scalar* _tri, Index triStride,

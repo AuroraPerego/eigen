@@ -19,6 +19,7 @@ namespace internal {
 template<typename LhsScalar, typename RhsScalar, typename Index, int Mode, bool Conjugate, int StorageOrder>
 struct triangular_solve_vector<LhsScalar, RhsScalar, Index, OnTheRight, Mode, Conjugate, StorageOrder>
 {
+  EIGEN_DEVICE_FUNC
   static void run(Index size, const LhsScalar* _lhs, Index lhsStride, RhsScalar* rhs)
   {
     triangular_solve_vector<LhsScalar,RhsScalar,Index,OnTheLeft,
@@ -35,6 +36,7 @@ struct triangular_solve_vector<LhsScalar, RhsScalar, Index, OnTheLeft, Mode, Con
   enum {
     IsLower = ((Mode&Lower)==Lower)
   };
+  EIGEN_DEVICE_FUNC
   static void run(Index size, const LhsScalar* _lhs, Index lhsStride, RhsScalar* rhs)
   {
     typedef Map<const Matrix<LhsScalar,Dynamic,Dynamic,RowMajor>, 0, OuterStride<> > LhsMap;
@@ -92,6 +94,7 @@ struct triangular_solve_vector<LhsScalar, RhsScalar, Index, OnTheLeft, Mode, Con
   enum {
     IsLower = ((Mode&Lower)==Lower)
   };
+  EIGEN_DEVICE_FUNC
   static void run(Index size, const LhsScalar* _lhs, Index lhsStride, RhsScalar* rhs)
   {
     typedef Map<const Matrix<LhsScalar,Dynamic,Dynamic,ColMajor>, 0, OuterStride<> > LhsMap;

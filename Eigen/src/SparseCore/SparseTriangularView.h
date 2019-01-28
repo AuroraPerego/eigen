@@ -38,6 +38,7 @@ template<typename MatrixType, unsigned int Mode> class TriangularViewImpl<Matrix
     
   protected:
     // dummy solve function to make TriangularView happy.
+    EIGEN_DEVICE_FUNC
     void solve() const;
 
     typedef SparseMatrixBase<TriangularViewType> Base;
@@ -58,10 +59,14 @@ template<typename MatrixType, unsigned int Mode> class TriangularViewImpl<Matrix
     }
 
     /** Applies the inverse of \c *this to the dense vector or matrix \a other, "in-place" */
-    template<typename OtherDerived> void solveInPlace(MatrixBase<OtherDerived>& other) const;
+    template<typename OtherDerived>
+    EIGEN_DEVICE_FUNC
+    void solveInPlace(MatrixBase<OtherDerived>& other) const;
 
     /** Applies the inverse of \c *this to the sparse vector or matrix \a other, "in-place" */
-    template<typename OtherDerived> void solveInPlace(SparseMatrixBase<OtherDerived>& other) const;
+    template<typename OtherDerived>
+    EIGEN_DEVICE_FUNC
+    void solveInPlace(SparseMatrixBase<OtherDerived>& other) const;
   
 };
 
@@ -93,8 +98,10 @@ public:
     Flags = XprType::Flags
   };
     
+  EIGEN_DEVICE_FUNC
   explicit unary_evaluator(const XprType &xpr) : m_argImpl(xpr.nestedExpression()), m_arg(xpr.nestedExpression()) {}
   
+  EIGEN_DEVICE_FUNC
   inline Index nonZerosEstimate() const {
     return m_argImpl.nonZerosEstimate();
   }
@@ -104,6 +111,7 @@ public:
       typedef EvalIterator Base;
     public:
 
+      EIGEN_DEVICE_FUNC
       EIGEN_STRONG_INLINE InnerIterator(const unary_evaluator& xprEval, Index outer)
         : Base(xprEval.m_argImpl,outer), m_returnOne(false), m_containsDiag(Base::outer()<xprEval.m_arg.innerSize())
       {
@@ -122,6 +130,7 @@ public:
         }
       }
 
+      EIGEN_DEVICE_FUNC
       EIGEN_STRONG_INLINE InnerIterator& operator++()
       {
         if(HasUnitDiag && m_returnOne)
@@ -139,6 +148,7 @@ public:
         return *this;
       }
       
+      EIGEN_DEVICE_FUNC
       EIGEN_STRONG_INLINE operator bool() const
       {
         if(HasUnitDiag && m_returnOne)
@@ -153,11 +163,13 @@ public:
 
 //       inline Index row() const { return (ArgType::Flags&RowMajorBit ? Base::outer() : this->index()); }
 //       inline Index col() const { return (ArgType::Flags&RowMajorBit ? this->index() : Base::outer()); }
+      EIGEN_DEVICE_FUNC
       inline StorageIndex index() const
       {
         if(HasUnitDiag && m_returnOne)  return internal::convert_index<StorageIndex>(Base::outer());
         else                            return Base::index();
       }
+      EIGEN_DEVICE_FUNC
       inline Scalar value() const
       {
         if(HasUnitDiag && m_returnOne)  return Scalar(1);
@@ -168,6 +180,7 @@ public:
       bool m_returnOne;
       bool m_containsDiag;
     private:
+      EIGEN_DEVICE_FUNC
       Scalar& valueRef();
   };
   
@@ -180,6 +193,7 @@ protected:
 
 template<typename Derived>
 template<int Mode>
+EIGEN_DEVICE_FUNC
 inline const TriangularView<const Derived, Mode>
 SparseMatrixBase<Derived>::triangularView() const
 {

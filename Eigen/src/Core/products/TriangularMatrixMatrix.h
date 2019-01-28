@@ -60,6 +60,7 @@ struct product_triangular_matrix_matrix<Scalar,Index,Mode,LhsIsTriangular,
                                            LhsStorageOrder,ConjugateLhs,
                                            RhsStorageOrder,ConjugateRhs,RowMajor,ResInnerStride,Version>
 {
+  EIGEN_DEVICE_FUNC
   static EIGEN_STRONG_INLINE void run(
     Index rows, Index cols, Index depth,
     const Scalar* lhs, Index lhsStride,
@@ -96,6 +97,7 @@ struct product_triangular_matrix_matrix<Scalar,Index,Mode,true,
     SetDiag = (Mode&(ZeroDiag|UnitDiag)) ? 0 : 1
   };
 
+  EIGEN_DEVICE_FUNC
   static EIGEN_DONT_INLINE void run(
     Index _rows, Index _cols, Index _depth,
     const Scalar* lhs_, Index lhsStride,
@@ -108,6 +110,7 @@ template <typename Scalar, typename Index, int Mode,
           int LhsStorageOrder, bool ConjugateLhs,
           int RhsStorageOrder, bool ConjugateRhs,
           int ResInnerStride, int Version>
+EIGEN_DEVICE_FUNC
 EIGEN_DONT_INLINE void product_triangular_matrix_matrix<Scalar,Index,Mode,true,
                                                         LhsStorageOrder,ConjugateLhs,
                                                         RhsStorageOrder,ConjugateRhs,ColMajor,ResInnerStride,Version>::run(
@@ -254,6 +257,7 @@ struct product_triangular_matrix_matrix<Scalar,Index,Mode,false,
     SetDiag = (Mode&(ZeroDiag|UnitDiag)) ? 0 : 1
   };
 
+  EIGEN_DEVICE_FUNC
   static EIGEN_DONT_INLINE void run(
     Index _rows, Index _cols, Index _depth,
     const Scalar* lhs_, Index lhsStride,
@@ -266,6 +270,7 @@ template <typename Scalar, typename Index, int Mode,
           int LhsStorageOrder, bool ConjugateLhs,
           int RhsStorageOrder, bool ConjugateRhs,
           int ResInnerStride, int Version>
+EIGEN_DEVICE_FUNC
 EIGEN_DONT_INLINE void product_triangular_matrix_matrix<Scalar,Index,Mode,false,
                                                         LhsStorageOrder,ConjugateLhs,
                                                         RhsStorageOrder,ConjugateRhs,ColMajor,ResInnerStride,Version>::run(
@@ -406,7 +411,9 @@ namespace internal {
 template<int Mode, bool LhsIsTriangular, typename Lhs, typename Rhs>
 struct triangular_product_impl<Mode,LhsIsTriangular,Lhs,false,Rhs,false>
 {
-  template<typename Dest> static void run(Dest& dst, const Lhs &a_lhs, const Rhs &a_rhs, const typename Dest::Scalar& alpha)
+  template<typename Dest>
+  EIGEN_DEVICE_FUNC
+  static void run(Dest& dst, const Lhs &a_lhs, const Rhs &a_rhs, const typename Dest::Scalar& alpha)
   {
     typedef typename Lhs::Scalar  LhsScalar;
     typedef typename Rhs::Scalar  RhsScalar;

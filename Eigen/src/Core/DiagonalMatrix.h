@@ -388,6 +388,7 @@ MatrixBase<Derived>::asDiagonal() const
   * \sa asDiagonal()
   */
 template<typename Derived>
+EIGEN_DEVICE_FUNC
 bool MatrixBase<Derived>::isDiagonal(const RealScalar& prec) const
 {
   if(cols() != rows()) return false;
