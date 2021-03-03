@@ -28,7 +28,13 @@ namespace internal {
 #ifndef EIGEN_ARCH_DEFAULT_NUMBER_OF_REGISTERS
 #define EIGEN_ARCH_DEFAULT_NUMBER_OF_REGISTERS  32
 #endif
-
+	
+// power9 yaya, not equal
+#ifndef vec_cmpne
+#  define vec_not(a) vec_nor(a, a)
+#  define vec_cmpne(a, b) vec_not(vec_cmpeq(a, b))
+#endif
+	
 typedef __vector float                   Packet4f;
 typedef __vector int                     Packet4i;
 typedef __vector unsigned int            Packet4ui;
