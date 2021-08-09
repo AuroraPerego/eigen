@@ -102,6 +102,7 @@ public:
   // Needed in C++14 to allow fix<N>():
   EIGEN_CONSTEXPR FixedInt operator() () const { return *this; }
 
+  EIGEN_DEVICE_FUNC
   VariableAndFixedInt<N> operator() (int val) const { return VariableAndFixedInt<N>(val); }
 };
 
@@ -138,8 +139,8 @@ template<int N> class VariableAndFixedInt
 {
 public:
   static const int value = N;
-  operator int() const { return m_value; }
-  VariableAndFixedInt(int val) { m_value = val; }
+  EIGEN_DEVICE_FUNC operator int() const { return m_value; }
+  EIGEN_DEVICE_FUNC VariableAndFixedInt(int val) { m_value = val; }
 protected:
   int m_value;
 };
@@ -212,6 +213,7 @@ constexpr internal::FixedInt<N> fix{};
   * \sa fix<N>(int), seq, seqN
   */
 template<int N>
+EIGEN_DEVICE_FUNC
 static const auto fix();
 
 /** \fn fix<N>(int)
@@ -243,6 +245,7 @@ static const auto fix();
   * \sa fix, seqN, class ArithmeticSequence
   */
 template<int N>
+EIGEN_DEVICE_FUNC
 static const auto fix(int val);
 
 #endif // EIGEN_PARSED_BY_DOXYGEN
