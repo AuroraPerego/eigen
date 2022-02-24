@@ -75,13 +75,7 @@ struct CacheSizes {
   CacheSizes(): m_l1(-1),m_l2(-1),m_l3(-1) {
     int l1CacheSize, l2CacheSize, l3CacheSize;
 
-#if !defined(EIGEN_CUDA_ARCH)
     queryCacheSizes(l1CacheSize, l2CacheSize, l3CacheSize);
-#else
-    l1CacheSize = defaultL1CacheSize;
-    l2CacheSize = 1572864;
-    l3CacheSize = defaultL3CacheSize;
-#endif
     m_l1 = manage_caching_sizes_helper(l1CacheSize, defaultL1CacheSize);
     m_l2 = manage_caching_sizes_helper(l2CacheSize, defaultL2CacheSize);
     m_l3 = manage_caching_sizes_helper(l3CacheSize, defaultL3CacheSize);
@@ -119,7 +113,19 @@ inline void manage_caching_sizes(Action action, std::ptrdiff_t* l1, std::ptrdiff
   {
     eigen_internal_assert(false);
   }
-  #else // EIGEN_CUDA_ARCH
+  #elif defined(EIGEN_HIP_DEVICE_COMPILE)
+  if (action==GetAction)
+  {
+    // GCN 5.0 / Radeon Pro WX 9100
+    *l1 =         16 * 1024;  // 16 KB per CU
+    *l2 =   4 * 1024 * 1024;  // 4 MB
+    *l3 =                 0;
+  }
+  else
+  {
+    eigen_internal_assert(false);
+  }
+  #else
   static CacheSizes m_cacheSizes;
 
   if(action==SetAction)
