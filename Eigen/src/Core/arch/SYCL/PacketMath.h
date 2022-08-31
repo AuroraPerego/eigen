@@ -128,11 +128,12 @@ ploadt(const Eigen::TensorSycl::internal::RangeAccess<
   template <>                                                          \
   EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE packet_type                    \
   ploadt_ro<packet_type, Alignment>(                                   \
-      const typename unpacket_traits<packet_type>::type* from) {       \
+    const typename unpacket_traits<packet_type>::type* from) {       \
     typedef typename unpacket_traits<packet_type>::type scalar;        \
+    typedef cl::sycl::multi_ptr< scalar, cl::sycl::access::address_space::private_space>  multi_ptr; \
     auto res = packet_type(static_cast<scalar>(0));                    \
     res.template load<cl::sycl::access::address_space::private_space>( \
-        0, const_cast<scalar*>(from));                                 \
+        0, multi_ptr(const_cast<scalar*>(from)) );                                 \
     return res;                                                        \
   }
 
@@ -144,11 +145,12 @@ SYCL_PLOADT_RO_SPECIAL(cl::sycl::cl_double2, Unaligned)
 #define SYCL_PLOAD_SPECIAL(packet_type, alignment_type)                    \
   template <>                                                              \
   EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE packet_type pload##alignment_type( \
-      const typename unpacket_traits<packet_type>::type* from) {           \
+     const typename unpacket_traits<packet_type>::type* from) {           \
     typedef typename unpacket_traits<packet_type>::type scalar;            \
+    typedef cl::sycl::multi_ptr< scalar, cl::sycl::access::address_space::private_space>  multi_ptr; \
     auto res = packet_type(static_cast<scalar>(0));                        \
     res.template load<cl::sycl::access::address_space::private_space>(     \
-        0, const_cast<scalar*>(from));                                     \
+        0, multi_ptr(const_cast<scalar*>(from)));                                     \
     return res;                                                            \
   }
 SYCL_PLOAD_SPECIAL(cl::sycl::cl_float4, )
