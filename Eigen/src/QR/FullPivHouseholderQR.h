@@ -262,7 +262,7 @@ template<typename MatrixType_> class FullPivHouseholderQR
       */
     inline Index rank() const
     {
-      using std::abs;
+      EIGEN_USING_STD_MATH(abs);
       eigen_assert(m_isInitialized && "FullPivHouseholderQR is not initialized.");
       RealScalar premultiplied_threshold = abs(m_maxpivot) * threshold();
       Index result = 0;
@@ -450,7 +450,7 @@ typename MatrixType::Scalar FullPivHouseholderQR<MatrixType>::determinant() cons
 template<typename MatrixType>
 typename MatrixType::RealScalar FullPivHouseholderQR<MatrixType>::absDeterminant() const
 {
-  using std::abs;
+  EIGEN_USING_STD_MATH(abs);
   eigen_assert(m_isInitialized && "FullPivHouseholderQR is not initialized.");
   eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
   return abs(m_qr.diagonal().prod());
@@ -482,7 +482,7 @@ FullPivHouseholderQR<MatrixType>& FullPivHouseholderQR<MatrixType>::compute(cons
 template<typename MatrixType>
 void FullPivHouseholderQR<MatrixType>::computeInPlace()
 {
-  using std::abs;
+  EIGEN_USING_STD_MATH(abs);
   Index rows = m_qr.rows();
   Index cols = m_qr.cols();
   Index size = (std::min)(rows,cols);

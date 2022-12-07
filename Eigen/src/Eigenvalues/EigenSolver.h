@@ -388,8 +388,8 @@ EigenSolver<MatrixType>::compute(const EigenBase<InputType>& matrix, bool comput
   using sycl::sqrt;
   using sycl::abs;
   #else
-  using std::sqrt;
-  using std::abs;
+  EIGEN_USING_STD_MATH(sqrt);
+  EIGEN_USING_STD_MATH(abs);
   #endif
   
   eigen_assert(matrix.cols() == matrix.rows());
@@ -466,7 +466,7 @@ EigenSolver<MatrixType>::compute(const EigenBase<InputType>& matrix, bool comput
 template<typename MatrixType>
 void EigenSolver<MatrixType>::doComputeEigenvectors()
 {
-  using std::abs;
+  EIGEN_USING_STD_MATH(abs);
   const Index size = m_eivec.cols();
   const Scalar eps = NumTraits<Scalar>::epsilon();
 

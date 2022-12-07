@@ -285,8 +285,8 @@ template<typename MatrixType>
 GeneralizedEigenSolver<MatrixType>&
 GeneralizedEigenSolver<MatrixType>::compute(const MatrixType& A, const MatrixType& B, bool computeEigenvectors)
 {
-  using std::sqrt;
-  using std::abs;
+  EIGEN_USING_STD_MATH(sqrt);
+  EIGEN_USING_STD_MATH(abs);
   eigen_assert(A.cols() == A.rows() && B.cols() == A.rows() && B.cols() == B.rows());
   Index size = A.cols();
   m_valuesOkay = false;
