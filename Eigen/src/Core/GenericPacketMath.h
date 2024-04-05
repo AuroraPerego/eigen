@@ -738,7 +738,7 @@ peven_mask(const Packet& /*a*/) {
 
 /** \internal copy the packet \a from to \a *to, \a to must be properly aligned */
 #ifdef EIGEN_USE_SYCL
-template<typename Scalar, typename Packet> SYCL_EXTERNAL EIGEN_DEVICE_FUNC inline void pstore(Scalar* to, const Packet& from)
+template<typename Scalar, typename Packet> EIGEN_DEVICE_FUNC inline void pstore(Scalar* to, const Packet& from)
 {  (*to) = from[0]; }
 #else
 template<typename Scalar, typename Packet> EIGEN_DEVICE_FUNC inline void pstore(Scalar* to, const Packet& from)
@@ -761,7 +761,7 @@ template<typename Scalar, typename Packet> EIGEN_DEVICE_FUNC inline void pstore_
 
 /** \internal copy the packet \a from to \a *to, (un-aligned store) */
 #ifdef EIGEN_USE_SYCL
-template<typename Scalar, typename Packet> SYCL_EXTERNAL EIGEN_DEVICE_FUNC inline void pstoreu(Scalar* to, const Packet& from)
+template<typename Scalar, typename Packet> EIGEN_DEVICE_FUNC inline void pstoreu(Scalar* to, const Packet& from)
 {  (*to) = from[0]; }
 #else
 template<typename Scalar, typename Packet> EIGEN_DEVICE_FUNC inline void pstoreu(Scalar* to, const Packet& from)

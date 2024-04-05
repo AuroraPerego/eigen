@@ -869,9 +869,6 @@ template<typename Scalar> inline EIGEN_MATHFUNC_RETVAL(random, Scalar) random();
 template<typename Scalar>
 struct random_default_impl<Scalar, false, false>
 {
-  #ifdef EIGEN_USE_SYCL
-  SYCL_EXTERNAL 
-  #endif
   static inline Scalar run(const Scalar& x, const Scalar& y)
   {
     #ifdef EIGEN_USE_SYCL

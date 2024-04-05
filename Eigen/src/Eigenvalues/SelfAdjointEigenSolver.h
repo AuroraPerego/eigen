@@ -15,7 +15,7 @@
 
 #include "./InternalHeaderCheck.h"
 
-namespace Eigen { 
+namespace Eigen {
 
 template<typename MatrixType_>
 class GeneralizedSelfAdjointEigenSolver;
@@ -86,11 +86,11 @@ template<typename MatrixType_> class SelfAdjointEigenSolver
       Options = MatrixType::Options,
       MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime
     };
-    
+
     /** \brief Scalar type for matrices of type \p MatrixType_. */
     typedef typename MatrixType::Scalar Scalar;
     typedef Eigen::Index Index; ///< \deprecated since Eigen 3.3
-    
+
     typedef Matrix<Scalar,Size,Size,ColMajor,MaxColsAtCompileTime,MaxColsAtCompileTime> EigenvectorsType;
 
     /** \brief Real scalar type for \p MatrixType_.
@@ -100,7 +100,7 @@ template<typename MatrixType_> class SelfAdjointEigenSolver
       * complex.
       */
     typedef typename NumTraits<Scalar>::Real RealScalar;
-    
+
     friend struct internal::direct_selfadjoint_eigenvalues<SelfAdjointEigenSolver,Size,NumTraits<Scalar>::IsComplex>;
 
     /** \brief Type for vector of eigenvalues as returned by eigenvalues().
@@ -216,19 +216,19 @@ template<typename MatrixType_> class SelfAdjointEigenSolver
     template<typename InputType>
     EIGEN_DEVICE_FUNC
     SelfAdjointEigenSolver& compute(const EigenBase<InputType>& matrix, int options = ComputeEigenvectors);
-    
+
     /** \brief Computes eigendecomposition of given matrix using a closed-form algorithm
       *
       * This is a variant of compute(const MatrixType&, int options) which
       * directly solves the underlying polynomial equation.
-      * 
+      *
       * Currently only 2x2 and 3x3 matrices for which the sizes are known at compile time are supported (e.g., Matrix3d).
-      * 
+      *
       * This method is usually significantly faster than the QR iterative algorithm
       * but it might also be less accurate. It is also worth noting that
       * for 3x3 matrices it involves trigonometric operations which are
       * not necessarily available for all scalar types.
-      * 
+      *
       * For the 3x3 case, we observed the following worst case relative error regarding the eigenvalues:
       *   - double: 1e-8
       *   - float:  1e-3
@@ -454,7 +454,7 @@ SelfAdjointEigenSolver<MatrixType>& SelfAdjointEigenSolver<MatrixType>
   internal::tridiagonalization_inplace(mat, diag, m_subdiag, m_hcoeffs, computeEigenvectors);
 
   m_info = internal::computeFromTridiagonal_impl(diag, m_subdiag, m_maxIterations, computeEigenvectors, m_eivec);
-  
+
   // scale back the eigen values
   m_eivalues *= scale;
 
@@ -506,7 +506,7 @@ ComputationInfo computeFromTridiagonal_impl(DiagType& diag, SubDiagType& subdiag
   Index end = n-1;
   Index start = 0;
   Index iter = 0; // total number of iterations
-  
+
   typedef typename DiagType::RealScalar RealScalar;
   const RealScalar considerAsZero = (std::numeric_limits<RealScalar>::min)();
   const RealScalar precision_inv = RealScalar(1)/NumTraits<RealScalar>::epsilon();
@@ -567,7 +567,7 @@ ComputationInfo computeFromTridiagonal_impl(DiagType& diag, SubDiagType& subdiag
   }
   return info;
 }
-  
+
 template<typename SolverType,int Size,bool IsComplex> struct direct_selfadjoint_eigenvalues
 {
   EIGEN_DEVICE_FUNC
@@ -581,7 +581,7 @@ template<typename SolverType> struct direct_selfadjoint_eigenvalues<SolverType,3
   typedef typename SolverType::RealVectorType VectorType;
   typedef typename SolverType::Scalar Scalar;
   typedef typename SolverType::EigenvectorsType EigenvectorsType;
-  
+
 
   /** \internal
    * Computes the roots of the characteristic polynomial of \a m.
@@ -595,7 +595,7 @@ template<typename SolverType> struct direct_selfadjoint_eigenvalues<SolverType,3
     EIGEN_USING_STD_MATH(cos)
     EIGEN_USING_STD_MATH(sin)
     const Scalar s_inv3 = Scalar(1)/Scalar(3);
-    const Scalar s_sqrt3 = sqrt(Scalar(3));
+    const Scalar s_sqrt3 = ::hipsycl::sycl::detail::__hipsycl_sqrt(Scalar(3));
 
     // The characteristic equation is x^3 - c2*x^2 + c1*x - c0 = 0.  The
     // eigenvalues are the roots to this equation, all guaranteed to be
@@ -616,10 +616,10 @@ template<typename SolverType> struct direct_selfadjoint_eigenvalues<SolverType,3
     q = numext::maxi(q, Scalar(0));
 
     // Compute the eigenvalues by solving for the roots of the polynomial.
-    Scalar rho = sqrt(a_over_3);
-    Scalar theta = atan2(sqrt(q),half_b)*s_inv3;  // since sqrt(q) > 0, atan2 is in [0, pi] and theta is in [0, pi/3]
-    Scalar cos_theta = cos(theta);
-    Scalar sin_theta = sin(theta);
+    Scalar rho = ::hipsycl::sycl::detail::__hipsycl_sqrt(a_over_3);
+    Scalar theta = atan2(::hipsycl::sycl::detail::__hipsycl_sqrt(q),half_b)*s_inv3;  // since sqrt(q) > 0, atan2 is in [0, pi] and theta is in [0, pi/3]
+    Scalar cos_theta = ::hipsycl::sycl::detail::__hipsycl_cos(theta);
+    Scalar sin_theta = ::hipsycl::sycl::detail::__hipsycl_sin(theta);
     // roots are already sorted, since cos is monotonically decreasing on [0, pi]
     roots(0) = c2_over_3 - rho*(cos_theta + s_sqrt3*sin_theta); // == 2*rho*cos(theta+2pi/3)
     roots(1) = c2_over_3 - rho*(cos_theta - s_sqrt3*sin_theta); // == 2*rho*cos(theta+ pi/3)
@@ -641,8 +641,8 @@ template<typename SolverType> struct direct_selfadjoint_eigenvalues<SolverType,3
     VectorType c0, c1;
     n0 = (c0 = representative.cross(mat.col((i0+1)%3))).squaredNorm();
     n1 = (c1 = representative.cross(mat.col((i0+2)%3))).squaredNorm();
-    if(n0>n1) res = c0/sqrt(n0);
-    else      res = c1/sqrt(n1);
+    if(n0>n1) res = c0/::hipsycl::sycl::detail::__hipsycl_sqrt(n0);
+    else      res = c1/::hipsycl::sycl::detail::__hipsycl_sqrt(n1);
 
     return true;
   }
@@ -655,10 +655,10 @@ template<typename SolverType> struct direct_selfadjoint_eigenvalues<SolverType,3
             && (options&EigVecMask)!=EigVecMask
             && "invalid option parameter");
     bool computeEigenvectors = (options&ComputeEigenvectors)==ComputeEigenvectors;
-    
+
     EigenvectorsType& eivecs = solver.m_eivec;
     VectorType& eivals = solver.m_eivalues;
-  
+
     // Shift the matrix to the mean eigenvalue and map the matrix coefficients to [-1:1] to avoid over- and underflow.
     Scalar shift = mat.trace() / Scalar(3);
     // TODO Avoid this copy. Currently it is necessary to suppress bogus values when determining maxCoeff and for computing the eigenvectors later
@@ -725,7 +725,7 @@ template<typename SolverType> struct direct_selfadjoint_eigenvalues<SolverType,3
     // Rescale back to the original size.
     eivals *= scale;
     eivals.array() += shift;
-    
+
     solver.m_info = Success;
     solver.m_isInitialized = true;
     solver.m_eigenvectorsOk = computeEigenvectors;
@@ -733,39 +733,39 @@ template<typename SolverType> struct direct_selfadjoint_eigenvalues<SolverType,3
 };
 
 // 2x2 direct eigenvalues decomposition, code from Hauke Heibel
-template<typename SolverType> 
+template<typename SolverType>
 struct direct_selfadjoint_eigenvalues<SolverType,2,false>
 {
   typedef typename SolverType::MatrixType MatrixType;
   typedef typename SolverType::RealVectorType VectorType;
   typedef typename SolverType::Scalar Scalar;
   typedef typename SolverType::EigenvectorsType EigenvectorsType;
-  
+
   EIGEN_DEVICE_FUNC
   static inline void computeRoots(const MatrixType& m, VectorType& roots)
   {
     EIGEN_USING_STD_MATH(sqrt);
-    const Scalar t0 = Scalar(0.5) * sqrt( numext::abs2(m(0,0)-m(1,1)) + Scalar(4)*numext::abs2(m(1,0)));
+    const Scalar t0 = Scalar(0.5) * ::hipsycl::sycl::detail::__hipsycl_sqrt( numext::abs2(m(0,0)-m(1,1)) + Scalar(4)*numext::abs2(m(1,0)));
     const Scalar t1 = Scalar(0.5) * (m(0,0) + m(1,1));
     roots(0) = t1 - t0;
     roots(1) = t1 + t0;
   }
-  
+
   EIGEN_DEVICE_FUNC
   static inline void run(SolverType& solver, const MatrixType& mat, int options)
   {
     EIGEN_USING_STD_MATH(sqrt);
     EIGEN_USING_STD_MATH(abs);
-    
+
     eigen_assert(mat.cols() == 2 && mat.cols() == mat.rows());
     eigen_assert((options&~(EigVecMask|GenEigMask))==0
             && (options&EigVecMask)!=EigVecMask
             && "invalid option parameter");
     bool computeEigenvectors = (options&ComputeEigenvectors)==ComputeEigenvectors;
-    
+
     EigenvectorsType& eivecs = solver.m_eivec;
     VectorType& eivals = solver.m_eivalues;
-  
+
     // Shift the matrix to the mean eigenvalue and map the matrix coefficients to [-1:1] to avoid over- and underflow.
     Scalar shift = mat.trace() / Scalar(2);
     MatrixType scaledMat = mat;
@@ -781,7 +781,7 @@ struct direct_selfadjoint_eigenvalues<SolverType,2,false>
     // compute the eigen vectors
     if(computeEigenvectors)
     {
-      if((eivals(1)-eivals(0))<=abs(eivals(1))*Eigen::NumTraits<Scalar>::epsilon())
+      if((eivals(1)-eivals(0))<=::hipsycl::sycl::detail::__hipsycl_abs(eivals(1))*Eigen::NumTraits<Scalar>::epsilon())
       {
         eivecs.setIdentity();
       }
@@ -794,12 +794,12 @@ struct direct_selfadjoint_eigenvalues<SolverType,2,false>
         if(a2>c2)
         {
           eivecs.col(1) << -scaledMat(1,0), scaledMat(0,0);
-          eivecs.col(1) /= sqrt(a2+b2);
+          eivecs.col(1) /= ::hipsycl::sycl::detail::__hipsycl_sqrt(a2+b2);
         }
         else
         {
           eivecs.col(1) << -scaledMat(1,1), scaledMat(1,0);
-          eivecs.col(1) /= sqrt(c2+b2);
+          eivecs.col(1) /= ::hipsycl::sycl::detail::__hipsycl_sqrt(c2+b2);
         }
 
         eivecs.col(0) << eivecs.col(1).unitOrthogonal();
@@ -851,7 +851,7 @@ static void tridiagonal_qr_step(RealScalar* diag, RealScalar* subdiag, Index sta
     if(numext::is_exactly_zero(e2)) {
       mu -= e / ((td + (td>RealScalar(0) ? h : -h)) / e);
     } else {
-      mu -= e2 / (td + (td>RealScalar(0) ? h : -h)); 
+      mu -= e2 / (td + (td>RealScalar(0) ? h : -h));
     }
   }
 
@@ -871,7 +871,7 @@ static void tridiagonal_qr_step(RealScalar* diag, RealScalar* subdiag, Index sta
     diag[k] = rot.c() * (rot.c() * diag[k] - rot.s() * subdiag[k]) - rot.s() * (rot.c() * subdiag[k] - rot.s() * diag[k+1]);
     diag[k+1] = rot.s() * sdk + rot.c() * dkp1;
     subdiag[k] = rot.c() * sdk - rot.s() * dkp1;
-    
+
     if (k > start)
       subdiag[k - 1] = rot.c() * subdiag[k-1] - rot.s() * z;
 
@@ -882,7 +882,7 @@ static void tridiagonal_qr_step(RealScalar* diag, RealScalar* subdiag, Index sta
       z = -rot.s() * subdiag[k+1];
       subdiag[k + 1] = rot.c() * subdiag[k+1];
     }
-    
+
     // apply the givens rotation to the unit matrix Q = Q * G
     if (matrixQ)
     {
