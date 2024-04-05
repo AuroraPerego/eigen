@@ -1046,7 +1046,7 @@ namespace Eigen {
 #endif
 
 #if (defined(EIGEN_USE_SYCL))
-  #define EIGEN_USING_STD_MATH(FUNC) using sycl::FUNC;
+  #define EIGEN_USING_STD_MATH(FUNC) using ::hipsycl::sycl::detail::__hipsycl_ ## FUNC;
 #elif (defined(EIGEN_CUDA_ARCH) && defined(__NVCC__)) || defined(EIGEN_HIP_DEVICE_COMPILE)
   #define EIGEN_USING_STD_MATH(FUNC) using ::FUNC;
 #else

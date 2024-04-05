@@ -578,25 +578,25 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC float bfloat16_to_float(__bfloat16_raw h) 
 
 // --- standard functions ---
 
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isinf)(const bfloat16& a) {
-  EIGEN_USING_STD_MATH(isinf);
-#if defined(EIGEN_USE_HIP_BF16)
-  return (isinf)(a); // Uses HIP hip_bfloat16 isinf operator
-#else
-  return (isinf)(float(a));
-#endif
-}
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isnan)(const bfloat16& a) {
-  EIGEN_USING_STD_MATH(isnan);
-#if defined(EIGEN_USE_HIP_BF16)
-  return (isnan)(a); // Uses HIP hip_bfloat16 isnan operator
-#else
-  return (isnan)(float(a));
-#endif
-}
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isfinite)(const bfloat16& a) {
-  return !(isinf EIGEN_NOT_A_MACRO (a)) && !(isnan EIGEN_NOT_A_MACRO (a));
-}
+//EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isinf)(const bfloat16& a) {
+//  EIGEN_USING_STD_MATH(isinf);
+//#if defined(EIGEN_USE_HIP_BF16)
+//  return (isinf)(a); // Uses HIP hip_bfloat16 isinf operator
+//#else
+//  return (isinf)(float(a));
+//#endif
+//}
+//EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isnan)(const bfloat16& a) {
+//  EIGEN_USING_STD_MATH(isnan);
+//#if defined(EIGEN_USE_HIP_BF16)
+//  return (isnan)(a); // Uses HIP hip_bfloat16 isnan operator
+//#else
+//  return (isnan)(float(a));
+//#endif
+//}
+//EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isfinite)(const bfloat16& a) {
+//  return !(isinf EIGEN_NOT_A_MACRO (a)) && !(isnan EIGEN_NOT_A_MACRO (a));
+//}
 
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 abs(const bfloat16& a) {
   numext::uint16_t x = numext::bit_cast<numext::uint16_t>(a) & 0x7FFF;
@@ -772,23 +772,23 @@ template<> struct NumTraits<Eigen::bfloat16>
 namespace Eigen {
 namespace numext {
 
-template<>
-EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
-bool (isnan)(const Eigen::bfloat16& h) {
-  return (bfloat16_impl::isnan)(h);
-}
+//template<>
+//EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
+//bool (isnan)(const Eigen::bfloat16& h) {
+//  return (bfloat16_impl::isnan)(h);
+//}
+//
+//template<>
+//EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
+//bool (isinf)(const Eigen::bfloat16& h) {
+//  return (bfloat16_impl::isinf)(h);
+//}
 
-template<>
-EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
-bool (isinf)(const Eigen::bfloat16& h) {
-  return (bfloat16_impl::isinf)(h);
-}
-
-template<>
-EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
-bool (isfinite)(const Eigen::bfloat16& h) {
-  return (bfloat16_impl::isfinite)(h);
-}
+//template<>
+//EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
+//bool (isfinite)(const Eigen::bfloat16& h) {
+//  return (bfloat16_impl::isfinite)(h);
+//}
 
 template <>
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Eigen::bfloat16 bit_cast<Eigen::bfloat16, uint16_t>(const uint16_t& src) {

@@ -86,10 +86,10 @@ struct sycl_packet_traits : default_packet_traits {
     typedef packet_type half;                                              \
   };
 
-SYCL_PACKET_TRAITS(cl::sycl::cl_float4, 1, float, 4)
-SYCL_PACKET_TRAITS(cl::sycl::cl_float4, 1, const float, 4)
-SYCL_PACKET_TRAITS(cl::sycl::cl_double2, 0, double, 2)
-SYCL_PACKET_TRAITS(cl::sycl::cl_double2, 0, const double, 2)
+SYCL_PACKET_TRAITS(hipsycl::sycl::float4, 1, float, 4)
+SYCL_PACKET_TRAITS(hipsycl::sycl::float4, 1, const float, 4)
+SYCL_PACKET_TRAITS(hipsycl::sycl::double2, 0, double, 2)
+SYCL_PACKET_TRAITS(hipsycl::sycl::double2, 0, const double, 2)
 #undef SYCL_PACKET_TRAITS
 
 // Make sure this is only available when targeting a GPU: we don't want to
@@ -100,8 +100,8 @@ SYCL_PACKET_TRAITS(cl::sycl::cl_double2, 0, const double, 2)
   struct is_arithmetic<packet_type> { \
     enum { value = true };            \
   };
-SYCL_ARITHMETIC(cl::sycl::cl_float4)
-SYCL_ARITHMETIC(cl::sycl::cl_double2)
+SYCL_ARITHMETIC(hipsycl::sycl::float4)
+SYCL_ARITHMETIC(hipsycl::sycl::double2)
 #undef SYCL_ARITHMETIC
 
 #define SYCL_UNPACKET_TRAITS(packet_type, unpacket_type, lengths)        \
@@ -111,8 +111,8 @@ SYCL_ARITHMETIC(cl::sycl::cl_double2)
     enum { size = lengths, vectorizable = true, alignment = Aligned16 }; \
     typedef packet_type half;                                            \
   };
-SYCL_UNPACKET_TRAITS(cl::sycl::cl_float4, float, 4)
-SYCL_UNPACKET_TRAITS(cl::sycl::cl_double2, double, 2)
+SYCL_UNPACKET_TRAITS(hipsycl::sycl::float4, float, 4)
+SYCL_UNPACKET_TRAITS(hipsycl::sycl::double2, double, 2)
 
 #undef SYCL_UNPACKET_TRAITS
 #endif
@@ -164,7 +164,7 @@ struct PacketWrapper<PacketReturnType, 4> {
       case 3:
         return in.w();
       default:
-      //INDEX MUST BE BETWEEN 0 and 3.There is no abort function in SYCL kernel. so we cannot use abort here. 
+      //INDEX MUST BE BETWEEN 0 and 3.There is no abort function in SYCL kernel. so we cannot use abort here.
       // The code will never reach here
       __builtin_unreachable();
     }
@@ -209,13 +209,13 @@ struct PacketWrapper<PacketReturnType, 2> {
       case 1:
         return in.y();
       default:
-        //INDEX MUST BE BETWEEN 0 and 1.There is no abort function in SYCL kernel. so we cannot use abort here. 
+        //INDEX MUST BE BETWEEN 0 and 1.There is no abort function in SYCL kernel. so we cannot use abort here.
       // The code will never reach here
         __builtin_unreachable();
     }
     __builtin_unreachable();
   }
-  
+
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE static PacketReturnType convert_to_packet_type(
       Scalar in, Scalar other) {
     return PacketReturnType(in, other);

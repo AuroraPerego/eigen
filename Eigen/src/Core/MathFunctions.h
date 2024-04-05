@@ -19,6 +19,30 @@
 
 #include "./InternalHeaderCheck.h"
 
+
+#if defined(SYCL_DEVICE_ONLY)
+
+namespace cl::sycl {
+  using cl_uchar  = ::hipsycl::sycl::detail::u_char;
+  using cl_ushort = ::hipsycl::sycl::detail::u_short;
+  using cl_uint   = ::hipsycl::sycl::detail::u_int;
+  using cl_ulong  = ::hipsycl::sycl::detail::u_long;
+
+  using cl_char  = ::hipsycl::sycl::detail::s_char;
+  using cl_short = ::hipsycl::sycl::detail::s_short;
+  using cl_int   = ::hipsycl::sycl::detail::s_int;
+  using cl_long  = ::hipsycl::sycl::detail::s_long;
+
+  using cl_float  = ::hipsycl::sycl::detail::sp_float;
+  using cl_double = ::hipsycl::sycl::detail::dp_float;
+  using cl_half   = ::hipsycl::sycl::detail::hp_float;
+
+  using cl_int4 = ::hipsycl::sycl::int4;
+  using cl_float4 = ::hipsycl::sycl::float4;
+  using cl_double2 = ::hipsycl::sycl::double2;
+}
+#endif
+
 namespace Eigen {
 
 namespace internal {
@@ -1206,7 +1230,6 @@ EIGEN_ALWAYS_INLINE long double maxi(const long double& x, const long double& y)
 
 #if defined(SYCL_DEVICE_ONLY)
 
-
 #define SYCL_SPECIALIZE_SIGNED_INTEGER_TYPES_BINARY(NAME, FUNC) \
   SYCL_SPECIALIZE_BINARY_FUNC(NAME, FUNC, cl::sycl::cl_char)   \
   SYCL_SPECIALIZE_BINARY_FUNC(NAME, FUNC, cl::sycl::cl_short)  \
@@ -1400,10 +1423,6 @@ inline EIGEN_MATHFUNC_RETVAL(log1p, Scalar) log1p(const Scalar& x)
   return EIGEN_MATHFUNC_IMPL(log1p, Scalar)::run(x);
 }
 
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(log1p, log1p)
-#endif
-
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 float log1p(const float &x) { return ::log1pf(x); }
@@ -1419,19 +1438,9 @@ inline typename internal::pow_impl<ScalarX,ScalarY>::result_type pow(const Scala
   return internal::pow_impl<ScalarX,ScalarY>::run(x, y);
 }
 
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_BINARY(pow, pow)
-#endif
-
 template<typename T> EIGEN_DEVICE_FUNC bool (isnan)   (const T &x) { return internal::isnan_impl(x); }
 template<typename T> EIGEN_DEVICE_FUNC bool (isinf)   (const T &x) { return internal::isinf_impl(x); }
 template<typename T> EIGEN_DEVICE_FUNC bool (isfinite)(const T &x) { return internal::isfinite_impl(x); }
-
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY_FUNC_RET_TYPE(isnan, isnan, bool)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY_FUNC_RET_TYPE(isinf, isinf, bool)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY_FUNC_RET_TYPE(isfinite, isfinite, bool)
-#endif
 
 template<typename Scalar>
 EIGEN_DEVICE_FUNC
@@ -1447,10 +1456,6 @@ inline EIGEN_MATHFUNC_RETVAL(round, Scalar) round(const Scalar& x)
   return EIGEN_MATHFUNC_IMPL(round, Scalar)::run(x);
 }
 
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(round, round)
-#endif
-
 template<typename T>
 EIGEN_DEVICE_FUNC
 T (floor)(const T& x)
@@ -1458,10 +1463,6 @@ T (floor)(const T& x)
   EIGEN_USING_STD_MATH(floor)
   return floor(x);
 }
-
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(floor, floor)
-#endif
 
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
@@ -1478,10 +1479,6 @@ T (ceil)(const T& x)
   EIGEN_USING_STD_MATH(ceil);
   return ceil(x);
 }
-
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(ceil, ceil)
-#endif
 
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
@@ -1528,10 +1525,6 @@ template<>
 EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS EIGEN_DEVICE_FUNC
 bool sqrt<bool>(const bool &x) { return x; }
 
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(sqrt, sqrt)
-#endif
-
 /** \returns the reciprocal square root of \a x. **/
 template<typename T>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
@@ -1545,10 +1538,6 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 T log(const T &x) {
   return internal::log_impl<T>::run(x);
 }
-
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(log, log)
-#endif
 
 
 #if defined(EIGEN_GPUCC)
@@ -1574,11 +1563,6 @@ abs(const T &x) {
   return x;
 }
 
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_INTEGER_TYPES_UNARY(abs, abs)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(abs, fabs)
-#endif
-
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 float abs(const float &x) { return ::fabsf(x); }
@@ -1603,10 +1587,6 @@ T exp(const T &x) {
   EIGEN_USING_STD_MATH(exp);
   return exp(x);
 }
-
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(exp, exp)
-#endif
 
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
@@ -1639,10 +1619,6 @@ inline EIGEN_MATHFUNC_RETVAL(expm1, Scalar) expm1(const Scalar& x)
   return EIGEN_MATHFUNC_IMPL(expm1, Scalar)::run(x);
 }
 
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(expm1, expm1)
-#endif
-
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 float expm1(const float &x) { return ::expm1f(x); }
@@ -1657,10 +1633,6 @@ T cos(const T &x) {
   EIGEN_USING_STD_MATH(cos);
   return cos(x);
 }
-
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(cos,cos)
-#endif
 
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
@@ -1677,10 +1649,6 @@ T sin(const T &x) {
   return sin(x);
 }
 
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(sin, sin)
-#endif
-
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 float sin(const float &x) { return ::sinf(x); }
@@ -1695,10 +1663,6 @@ T tan(const T &x) {
   EIGEN_USING_STD_MATH(tan);
   return tan(x);
 }
-
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(tan, tan)
-#endif
 
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
@@ -1722,11 +1686,6 @@ T acosh(const T &x) {
   EIGEN_USING_STD_MATH(acosh);
   return static_cast<T>(acosh(x));
 }
-#endif
-
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(acos, acos)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(acosh, acosh)
 #endif
 
 #if defined(EIGEN_GPUCC)
@@ -1753,11 +1712,6 @@ T asinh(const T &x) {
 }
 #endif
 
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(asin, asin)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(asinh, asinh)
-#endif
-
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 float asin(const float &x) { return ::asinf(x); }
@@ -1782,11 +1736,6 @@ T atanh(const T &x) {
 }
 #endif
 
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(atan, atan)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(atanh, atanh)
-#endif
-
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 float atan(const float &x) { return ::atanf(x); }
@@ -1803,10 +1752,6 @@ T cosh(const T &x) {
   return static_cast<T>(cosh(x));
 }
 
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(cosh, cosh)
-#endif
-
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 float cosh(const float &x) { return ::coshf(x); }
@@ -1821,10 +1766,6 @@ T sinh(const T &x) {
   EIGEN_USING_STD_MATH(sinh);
   return static_cast<T>(sinh(x));
 }
-
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(sinh, sinh)
-#endif
 
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
@@ -1846,10 +1787,6 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 float tanh(float x) { return internal::generic_fast_tanh_float(x); }
 #endif
 
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(tanh, tanh)
-#endif
-
 #if defined(EIGEN_GPUCC)
 template<> EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 float tanh(const float &x) { return ::tanhf(x); }
@@ -1864,10 +1801,6 @@ T fmod(const T& a, const T& b) {
   EIGEN_USING_STD_MATH(fmod);
   return fmod(a, b);
 }
-
-#if defined(SYCL_DEVICE_ONLY)
-SYCL_SPECIALIZE_FLOATING_TYPES_BINARY(fmod, fmod)
-#endif
 
 #if defined(EIGEN_GPUCC)
 template <>
@@ -1890,9 +1823,6 @@ double fmod(const double& a, const double& b) {
 #undef SYCL_SPECIALIZE_UNSIGNED_INTEGER_TYPES_UNARY
 #undef SYCL_SPECIALIZE_INTEGER_TYPES_BINARY
 #undef SYCL_SPECIALIZE_UNSIGNED_INTEGER_TYPES_UNARY
-#undef SYCL_SPECIALIZE_FLOATING_TYPES_BINARY
-#undef SYCL_SPECIALIZE_FLOATING_TYPES_UNARY
-#undef SYCL_SPECIALIZE_FLOATING_TYPES_UNARY_FUNC_RET_TYPE
 #undef SYCL_SPECIALIZE_GEN_UNARY_FUNC
 #undef SYCL_SPECIALIZE_UNARY_FUNC
 #undef SYCL_SPECIALIZE_GEN1_BINARY_FUNC
